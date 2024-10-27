@@ -113,6 +113,50 @@
       });
       localStorage.setItem("guildData", JSON.stringify(data));
     }
+const express = require('express');
+const fs = require('fs');
+const app = express();
+const bodyParser = require('body-parser');
+
+app.use(bodyParser.json());
+app.use(express.static('public')); // publicフォルダにHTMLファイルを置く
+
+app.post('/save', (req, res) => {
+    const data = req.body;
+    fs.writeFile('schedule.json', JSON.stringify(data), (err) => {
+        if (err) {
+            return res.status(500).send('Error saving data');
+        }
+        res.send('Data saved');
+    });
+});
+fetch('/schedule')
+    .then(response => response.json())
+    .then(data => {
+        const tbody = document.querySelector('#schedule-table tbody');
+        data.forEach(row => {
+            const tr = document.createElement('tr');
+            Object.values(row).forEach(cell => {
+                const td = document.createElement('td');
+                td.textContent = cell;
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        });
+    });
+
+app.get('/schedule', (req, res) => {
+    fs.readFile('schedule.json', (err, data) => {
+        if (err) {
+            return res.status(500).send('Error reading data');
+        }
+        res.json(JSON.parse(data));
+    });
+});
+
+app.listen(3000, () => {
+    console.log('Server is running on http://localhost:3000');
+});
 
     function resetData() {
       localStorage.setItem("guildData", JSON.stringify(initialData));
