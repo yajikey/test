@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+
+  <title>ギルドメンバーポジション表</title>
+  <script>
+    const initialData = [
+      { name: "たか", position: "前後", evaluations: ["〇", "〇", "〇"], drablere1: "", drablere2: "" },
+      { name: "フジハラ", position: "前後", evaluations: ["〇", "〇", "〇"], drablere1: "", drablere2: "" },
+      { name: "しょうた", position: "前後", evaluations: ["〇", "〇", "〇"], drablere1: "", drablere2: "" },
+      { name: "夜桜", position: "後", evaluations: ["〇", "〇", "〇"], drablere1: "", drablere2: "" },
+      { name: "夜識", position: "前後", evaluations: ["〇", "〇", "〇"], drablere1: "", drablere2: "" },
+      { name: "key", position: "前後", evaluations: ["〇", "〇", "〇"], drablere1: "", drablere2: "" },
+      { name: "F", position: "後", evaluations: ["〇", "〇", "〇"], drablere1: "", drablere2: "" },
+      { name: "rei(ヒナ)", position: "後", evaluations: ["〇", "〇", "〇"], drablere1: "", drablere2: "" },
+      { name: "のぶ", position: "前", evaluations: ["〇", "〇", "〇"], drablere1: "", drablere2: "" },
+      { name: "n", position: "後", evaluations: ["〇", "〇", "〇"], drablere1: "", drablere2: "" },
+      { name: "あずき茶", position: "前後", evaluations: ["〇", "〇", "〇"], drablere1: "", drablere2: "" },
+      { name: "スカスカ", position: "前後", evaluations: ["〇", "〇", "〇"], drablere1: "", drablere2: "" },
+      { name: "ゆっくりのフジハラ", position: "後", evaluations: ["〇", "〇", "〇"], drablere1: "", drablere2: "" },
+      { name: "nanなん", position: "後", evaluations: ["〇", "〇", "〇"], drablere1: "", drablere2: "" },
+      { name: "漣華", position: "前", evaluations: ["〇", "〇", "〇"], drablere1: "", drablere2: "" }
+    ];
+
+    function createTable() {
+      const memberCount = parseInt(document.getElementById("memberCount").value);
+      const tableBody = document.getElementById("guildTableBody");
+
+      tableBody.innerHTML = "";
+
+      const savedData = JSON.parse(localStorage.getItem("guildData")) || initialData;
+
+      for (let i = 0; i < memberCount; i++) {
+        const row = document.createElement("tr");
+
+        const noCell = document.createElement("td");
+        noCell.textContent = i + 1;
+        row.appendChild(noCell);
+
+        const nameCell = document.createElement("td");
+        const nameInput = document.createElement("input");
+        nameInput.type = "text";
+        nameInput.value = savedData[i]?.name || "";
+        nameInput.oninput = saveData;
+        nameCell.appendChild(nameInput);
+        row.appendChild(nameCell);
+
+        const positionCell = document.createElement("td");
+        const positionSelect = document.createElement("select");
+        ["前", "後", "前後"].forEach(optionText => {
+          const option = document.createElement("option");
+          option.value = optionText;
+          option.textContent = optionText;
+          if (optionText === (savedData[i]?.position || "前")) option.selected = true;
+          positionSelect.appendChild(option);
+        });
+        positionSelect.onchange = saveData;
+        positionCell.appendChild(positionSelect);
+        row.appendChild(positionCell);
+
+        ["昼", "夜１", "夜２"].forEach((time, index) => {
+          const evalCell = document.createElement("td");
+          const evalSelect = document.createElement("select");
+          ["〇", "△", "×", "？"].forEach(optionText => {
+            const option = document.createElement("option");
+            option.value = optionText;
+            option.textContent = optionText;
+            if (optionText === (savedData[i]?.evaluations[index] || "？")) option.selected = true;
+            evalSelect.appendChild(option);
+          });
+          evalSelect.onchange = saveData;
+          evalCell.appendChild(evalSelect);
+          row.appendChild(evalCell);
+        });
+
+        const dbCell1 = document.createElement("td");
+        const dbInput1 = document.createElement("input");
+        dbInput1.type = "text";
+        dbInput1.value = savedData[i]?.drablere1 || "";
+        dbInput1.oninput = saveData;
+        dbCell1.appendChild(dbInput1);
+        row.appendChild(dbCell1);
+
+        const dbCell2 = document.createElement("td");
+        const dbInput2 = document.createElement("input");
+        dbInput2.type = "text";
+        dbInput2.value = savedData[i]?.drablere2 || "";
+        dbInput2.oninput = saveData;
+        dbCell2.appendChild(dbInput2);
+        row.appendChild(dbCell2);
+
+        tableBody.appendChild(row);
+      }
+    }
+
+    function saveData() {
+      const tableBody = document.getElementById("guildTableBody");
+      const data = [];
+      [...tableBody.rows].forEach(row => {
+        const name = row.cells[1].querySelector("input").value;
+        const position = row.cells[2].querySelector("select").value;
+        const evaluations = [
+          row.cells[3].querySelector("select").value,
+          row.cells[4].querySelector("select").value,
+          row.cells[5].querySelector("select").value,
+        ];
+        const drablere1 = row.cells[6].querySelector("input").value;
+        const drablere2 = row.cells[7].querySelector("input").value;
+        data.push({ name, position, evaluations, drablere1, drablere2 });
+      });
+      localStorage.setItem("guildData", JSON.stringify(data));
+    }
+
+    function resetData() {
+      localStorage.setItem("guildData", JSON.stringify(initialData));
+      createTable();
+    }
+
+    function resetParticipationData() {
+      const savedData = JSON.parse(localStorage.getItem("guildData")) || initialData;
+      savedData.forEach(member => {
+        member.evaluations = ["〇", "〇", "〇"]; // デフォルト評価にリセット
+      });
+      localStorage.setItem("guildData", JSON.stringify(savedData));
+      createTable();
+    }
+    function populateMemberOptions() {
+  const savedData = JSON.parse(localStorage.getItem("guildData")) || initialData;
+  const members = savedData.map(member => member.name);
+  
+  for (let i = 1; i <= 5; i++) {
+    for (const time of ["", "_night1", "_night2"]) {
+      const select = document.getElementById(`member${i}${time}`);
+      members.forEach(member => {
+        const option = document.createElement("option");
+        option.value = member;
+        option.textContent = member;
+        select.appendChild(option);
+      });
+    }
+  }
+}
+function saveTableAsImage() {
+  const table = document.getElementById("scheduleTable");
+  html2canvas(table, {
+    onrendered: function(canvas) {
+      const link = document.createElement("a");
+      link.href = canvas.toDataURL("image/png"); // PNGとしてデータURLを取得
+      link.download = "schedule.png"; // ダウンロード名
+      link.click(); // リンクをクリックしてダウンロードを実行
+    }
+  });
+}
+
+function outputSchedule() {
+  const scheduleTable = document.getElementById("scheduleTable");
+  let output = "";
+
+  // 1行目（タイトル行）をスキップして、2行目から処理
+  for (let i = 1; i < scheduleTable.rows.length; i++) {
+    const row = scheduleTable.rows[i];
+    let rowData = [];
+    
+    // 各セルの内容を取得
+    for (let j = 0; j < row.cells.length; j++) {
+      rowData.push(row.cells[j].querySelector("select") ? row.cells[j].querySelector("select").value : row.cells[j].textContent.trim());
+    }
+    
+    // 行データをタブ区切りで結合し、改行を追加
+    output += rowData.join("\t") + "\n";
+  }
+
+  // 出力エリアに表示
+  const outputDiv = document.getElementById("outputString");
+  outputDiv.textContent = output; // 表示用のdivに文字列を設定
+}
+
+
+function resetSchedule() {
+  for (let i = 1; i <= 5; i++) {
+    for (const time of ["", "_night1", "_night2"]) {
+      const select = document.getElementById(`member${i}${time}`);
+      select.selectedIndex = 0; // 最初の選択肢にリセット
+    }
+  }
+}
+
+function copySchedule() {
+  const table = document.getElementById("scheduleTable");
+  const range = document.createRange();
+  range.selectNodeContents(table); // テーブル全体を選択
+  window.getSelection().removeAllRanges(); // 以前の選択を解除
+  window.getSelection().addRange(range); // 表を選択
+
+  // コピーを実行
+  try {
+    const successful = document.execCommand("copy");
+    if (successful) {
+      alert("参加予定リストがコピーされました。");
+    } else {
+      alert("コピーに失敗しました。");
+    }
+  } catch (err) {
+    console.error("コピー中にエラーが発生しました:", err);
+  }
+
+  window.getSelection().removeAllRanges(); // 選択を解除
+}
+
+
+    window.onload = () => {
+      const savedData = JSON.parse(localStorage.getItem("guildData"));
+      document.getElementById("memberCount").value = savedData ? savedData.length : initialData.length;
+      createTable();
+      populateMemberOptions();
+
+    };
+  </script>
+</head>
+<body>
+
+  <h1>ギルドメンバーポジション表</h1>
+
+  <label for="memberCount">ギルドメンバーの人数を選択してください（最大18人）:</label>
+  <select id="memberCount" onchange="createTable()">
+  </select>
+  
+  <script>
+    function populateMemberCountOptions() {
+      const memberSelect = document.getElementById("memberCount");
+      for (let i = 1; i <= 18; i++) {
+        const option = document.createElement("option");
+        option.value = i;
+        option.textContent = i;
+        memberSelect.appendChild(option);
+      }
+    }
+    populateMemberCountOptions();
+  </script>
+
+  <table border="1" id="guildTable">
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>名前</th>
+        <th>前/後</th>
+        <th>昼</th>
+        <th>夜１</th>
+        <th>夜２</th>
+        <th>ドラブレ１</th>
+        <th>ドラブレ２</th>
+      </tr>
+    </thead>
+    <tbody id="guildTableBody">
+    </tbody>
+  </table>
+
+  <button onclick="resetData()">リセット</button>
+  <button onclick="resetParticipationData()">参加予定リセット</button>
+  <h2>前衛予定リスト</h2>
+ 
+  <table border="1" id="scheduleTable">
+    <thead>
+      <tr>
+        <th>時間帯</th>
+        <th>メンバー１</th>
+        <th>メンバー２</th>
+        <th>メンバー３</th>
+        <th>メンバー４</th>
+        <th>メンバー５</th>
+      </tr>
+    </thead>
+    <tbody id="scheduleTableBody">
+      <tr>
+        <td>昼</td>
+        <td><select id="member1"></select></td>
+        <td><select id="member2"></select></td>
+        <td><select id="member3"></select></td>
+        <td><select id="member4"></select></td>
+        <td><select id="member5"></select></td>
+      </tr>
+      <tr>
+        <td>夜１</td>
+        <td><select id="member1_night1"></select></td>
+        <td><select id="member2_night1"></select></td>
+        <td><select id="member3_night1"></select></td>
+        <td><select id="member4_night1"></select></td>
+        <td><select id="member5_night1"></select></td>
+      </tr>
+      <tr>
+        <td>夜２</td>
+        <td><select id="member1_night2"></select></td>
+        <td><select id="member2_night2"></select></td>
+        <td><select id="member3_night2"></select></td>
+        <td><select id="member4_night2"></select></td>
+        <td><select id="member5_night2"></select></td>
+      </tr>
+    </tbody>
+  </table>
+  <button onclick="resetSchedule()">参加予定リセット</button>
+  
+
+  
+  <h2>出力結果</h2>
+<pre id="outputString"></pre>
+
+<button id="outputButton" onclick="outputSchedule()">出力</button>
+<div id="outputString" style="margin-top: 20px; white-space: pre-wrap;"></div>
+
+</body>
+</html>
