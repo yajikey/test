@@ -2,9 +2,8 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Firebaseデータ保存</title>
-    <script type="module">
+    <title>Firebaseデータ保存アプリ</title>
+     <script type="module">
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
         import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
@@ -52,12 +51,10 @@
     </script>
 </head>
 <body>
-    <h1>Firebaseデータ保存</h1>
+    <h1>データ保存アプリ</h1>
     <input type="text" id="dataInput" placeholder="データを入力">
     <button id="saveButton">保存</button>
     <button id="loadButton">復元</button>
-    
-    <h2>復元されたデータ:</h2>
-    <div id="output"></div>
+    <p id="output"></p>
 </body>
 </html>
