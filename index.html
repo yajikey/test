@@ -3,74 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Firebase Realtime Database Test</title>
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        input, button { margin: 5px; }
-    </style>
+    <title>Firebaseデータ保存</title>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCe3kGR5JuQU5EgHBw2pDOr7TYPqaPXzcs",
+            authDomain: "dbtest-584e8.firebaseapp.com",
+            databaseURL: "https://dbtest-584e8-default-rtdb.firebaseio.com",
+            projectId: "dbtest-584e8",
+            storageBucket: "dbtest-584e8.appspot.com",
+            messagingSenderId: "1081717487649",
+            appId: "1:1081717487649:web:7aed03927f2e09d3cd0b60",
+            measurementId: "G-DDL6F86VN4"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // データをFirebaseに保存
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('saveButton').addEventListener('click', function() {
+                const data = document.getElementById('dataInput').value;
+                set(ref(database, 'sharedData'), {
+                    value: data
+                })
+                .then(() => alert('データが保存されました'))
+                .catch(error => console.error('Error:', error));
+            });
+
+            // データをFirebaseから読み込む
+            document.getElementById('loadButton').addEventListener('click', function() {
+                const dbRef = ref(database);
+                get(child(dbRef, 'sharedData')).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const loadedData = snapshot.val();
+                        document.getElementById('output').innerText = loadedData.value;
+                    } else {
+                        document.getElementById('output').innerText = 'データはありません';
+                    }
+                }).catch(error => console.error('Error:', error));
+            });
+        });
+    </script>
 </head>
 <body>
-
-<h1>Firebase Realtime Database Test</h1>
-
-<input type="text" id="dataInput" placeholder="データを入力">
-<button id="saveButton">送信</button>
-<button id="loadButton">復元</button>
-
-<h2>復元されたデータ:</h2>
-<p id="output"></p>
-
-<script>
-    // Firebaseの設定オブジェクトをここに貼り付けてください
- <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyCe3kGR5JuQU5EgHBw2pDOr7TYPqaPXzcs",
-    authDomain: "dbtest-584e8.firebaseapp.com",
-    databaseURL: "https://dbtest-584e8-default-rtdb.firebaseio.com",
-    projectId: "dbtest-584e8",
-    storageBucket: "dbtest-584e8.appspot.com",
-    messagingSenderId: "1081717487649",
-    appId: "1:1081717487649:web:7aed03927f2e09d3cd0b60",
-    measurementId: "G-DDL6F86VN4"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
-
-    // Firebaseの初期化
-    const app = firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-
-    // データをFirebaseに保存
-    document.getElementById('saveButton').addEventListener('click', function() {
-        const data = document.getElementById('dataInput').value;
-        database.ref('sharedData').set({ value: data })
-            .then(() => alert('データが保存されました'))
-            .catch(error => console.error('Error:', error));
-    });
-
-    // データをFirebaseから読み込む
-    document.getElementById('loadButton').addEventListener('click', function() {
-        database.ref('sharedData').once('value')
-            .then(snapshot => {
-                const loadedData = snapshot.val();
-                document.getElementById('output').innerText = loadedData ? loadedData.value : 'データはありません';
-            })
-            .catch(error => console.error('Error:', error));
-    });
-</script>
-
+    <h1>Firebaseデータ保存</h1>
+    <input type="text" id="dataInput" placeholder="データを入力">
+    <button id="saveButton">保存</button>
+    <button id="loadButton">復元</button>
+    
+    <h2>復元されたデータ:</h2>
+    <div id="output"></div>
 </body>
 </html>
